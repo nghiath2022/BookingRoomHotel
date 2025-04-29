@@ -19,6 +19,22 @@ namespace BookingRoom.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // seed data
+            modelBuilder.Entity<Role>().HasData(
+                new Role
+                {
+                    Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                    Name = "Admin",
+                    Description = "Administrator"
+                },
+                new Role
+                {
+                    Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                    Name = "User",
+                    Description = "Regular User"
+                }
+            );
+
             // Unique constraint on Email
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)

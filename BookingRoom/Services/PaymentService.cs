@@ -17,7 +17,7 @@ namespace BookingRoom.Services
             return await _paymentRepository.GetAllPaymentsAsync();
         }
 
-        public async Task<Payment> GetPaymentByIdAsync(Guid id)
+        public async Task<Payment?> GetPaymentByIdAsync(Guid id)
         {
             return await _paymentRepository.GetPaymentByIdAsync(id);
         }

@@ -50,6 +50,9 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 // Auth
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+//JwtService
+builder.Services.AddScoped<IJwtService, JwtService>();
+
 // User
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -65,6 +68,9 @@ builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 // Payment
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
+//UnitOfWork
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // ===== 4. Add Controllers =====
 builder.Services.AddControllers();

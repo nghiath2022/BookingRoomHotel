@@ -54,13 +54,20 @@ namespace BookingRoom.Controllers
 
         // PUT: api/booking/{id}
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(BookingUpdateDto), 200)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Update(Guid id, [FromBody] BookingUpdateDto dto)
         {
-            if (id != dto.Id) return BadRequest();
+            var existingBooking = await _bookingService.GetBookingByIdAsync(id);
+            if (existingBooking == null)
+                return NotFound(new { message = "Booking not found." });
 
-            var booking = _mapper.Map<Booking>(dto);
-            var updated = await _bookingService.UpdateBookingAsync(booking);
-            return Ok(_mapper.Map<BookingDto>(updated));
+            // Mapper DTO into Entity existed.
+            _mapper.Map(dto, existingBooking);
+            existingBooking.Id = id; // Make sure the ID is set correctly.
+
+            var updatedBooking = await _bookingService.UpdateBookingAsync(existingBooking);
+            return Ok(_mapper.Map<BookingDto>(updatedBooking));
         }
 
         // DELETE: api/booking/{id}

@@ -22,7 +22,7 @@ namespace BookingRoom.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Payment> GetPaymentByIdAsync(Guid id)
+        public async Task<Payment?> GetPaymentByIdAsync(Guid id)
         {
             return await _context.Payments
                 .Include(p => p.Booking)

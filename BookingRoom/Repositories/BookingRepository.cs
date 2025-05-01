@@ -24,7 +24,7 @@ namespace BookingRoom.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Booking> GetBookingByIdAsync(Guid id)
+        public async Task<Booking?> GetBookingByIdAsync(Guid id)
         {
             return await _context.Bookings
                 .Include(b => b.User)
@@ -36,15 +36,14 @@ namespace BookingRoom.Repositories
 
         public async Task<Booking> CreateBookingAsync(Booking booking)
         {
-            _context.Bookings.Add(booking);
-            await _context.SaveChangesAsync();
+            await _context.Bookings.AddAsync(booking);
             return booking;
         }
 
         public async Task<Booking> UpdateBookingAsync(Booking booking)
         {
             _context.Bookings.Update(booking);
-            await _context.SaveChangesAsync();
+            await Task.CompletedTask;
             return booking;
         }
 
@@ -55,7 +54,6 @@ namespace BookingRoom.Repositories
 
             booking.Status = "Cancelled";
             _context.Bookings.Update(booking);
-            await _context.SaveChangesAsync();
             return true;
         }
     }

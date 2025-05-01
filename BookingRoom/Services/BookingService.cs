@@ -5,37 +5,40 @@ namespace BookingRoom.Services
 {
     public class BookingService : IBookingService
     {
-        private readonly IBookingRepository _bookingRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public BookingService(IBookingRepository bookingRepository)
+        public BookingService(IUnitOfWork unitOfWork)
         {
-            _bookingRepository = bookingRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<Booking>> GetAllBookingsAsync()
         {
-            return await _bookingRepository.GetAllBookingsAsync();
+            return await _unitOfWork.Bookings.GetAllBookingsAsync();
         }
 
-        public async Task<Booking> GetBookingByIdAsync(Guid id)
+        public async Task<Booking?> GetBookingByIdAsync(Guid id)
         {
-            return await _bookingRepository.GetBookingByIdAsync(id);
+            return await _unitOfWork.Bookings.GetBookingByIdAsync(id);
         }
 
         public async Task<Booking> CreateBookingAsync(Booking booking)
         {
-            // Business rule: thêm kiểm tra phòng trống, thời gian...
-            return await _bookingRepository.CreateBookingAsync(booking);
+            await _unitOfWork.Bookings.CreateBookingAsync(booking);
+            await _unitOfWork.CompleteAsync();
+            return booking;
         }
 
         public async Task<Booking> UpdateBookingAsync(Booking booking)
         {
-            return await _bookingRepository.UpdateBookingAsync(booking);
+            await _unitOfWork.Bookings.UpdateBookingAsync(booking);
+            await _unitOfWork.CompleteAsync();
+            return booking;
         }
 
         public async Task<bool> CancelBookingAsync(Guid id)
         {
-            return await _bookingRepository.CancelBookingAsync(id);
+            return await _unitOfWork.Bookings.CancelBookingAsync(id);
         }
     }
 }

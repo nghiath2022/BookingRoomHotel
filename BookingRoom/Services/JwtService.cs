@@ -26,9 +26,11 @@ namespace BookingRoom.Services
                 new Claim(ClaimTypes.Role, user.Role?.Name ?? "User")
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                _configuration["Jwt:SecretKey"]
-            ));
+            var secret = _configuration.GetValue<string>("Jwt:SecretKey");
+            if (string.IsNullOrEmpty(secret))
+                throw new Exception("JWT SecretKey is missing in configuration.");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

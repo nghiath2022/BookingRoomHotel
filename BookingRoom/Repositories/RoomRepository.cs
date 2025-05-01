@@ -8,7 +8,6 @@ namespace BookingRoom.Repositories
     public class RoomRepository : IRoomRepository
     {
         private readonly ApplicationDbContext _context;
-
         public RoomRepository(ApplicationDbContext context)
         {
             _context = context;
@@ -21,7 +20,7 @@ namespace BookingRoom.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Room> GetRoomByIdAsync(Guid id)
+        public async Task<Room?> GetRoomByIdAsync(Guid id)
         {
             return await _context.Rooms
                 .Include(r => r.RoomType)

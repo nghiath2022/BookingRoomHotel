@@ -5,7 +5,7 @@ namespace BookingRoom.Interfaces
     public interface IBookingService
     {
         Task<IEnumerable<Booking>> GetAllBookingsAsync();
-        Task<Booking> GetBookingByIdAsync(Guid id);
+        Task<Booking?> GetBookingByIdAsync(Guid id);
         Task<Booking> CreateBookingAsync(Booking booking);
         Task<Booking> UpdateBookingAsync(Booking booking);
         Task<bool> CancelBookingAsync(Guid id);

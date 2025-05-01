@@ -58,5 +58,18 @@ namespace BookingRoom.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> CheckAdminExistsAsync()
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .AnyAsync(u => u.Role.Name == "Admin");
+        }
+
+        public async Task<Role?> GetRoleByNameAsync(string name)
+        {
+            return await _context.Roles
+                .FirstOrDefaultAsync(r => r.Name.ToLower() == name.ToLower());
+        }
     }
 }

@@ -10,5 +10,7 @@ namespace BookingRoom.Interfaces
         Task<User> CreateUserAsync(User user);
         Task<User> UpdateUserAsync(User user);
         Task<bool> DeleteUserAsync(Guid id);
+        Task<bool> CheckAdminExistsAsync();
+        Task<Role?> GetRoleByNameAsync(string name);
     }
 }

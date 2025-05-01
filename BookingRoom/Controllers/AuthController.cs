@@ -4,6 +4,7 @@ using BookingRoom.Interfaces;
 using BookingRoom.Models;
 using BookingRoom.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace BookingRoom.Controllers
@@ -35,28 +36,23 @@ namespace BookingRoom.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            // Check email Existed ? 
-            var existing = await _userService.GetUserByEmailAsync(request.Email);
-            if (existing != null)
-                return BadRequest(new { message = "Email already registered." });
-
-            // Encrypted password
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
-            // Mặc định Role = User
-            var user = new User
+            try
             {
-                Id = Guid.NewGuid(),
-                FullName = request.FullName,
-                Email = request.Email,
-                PasswordHash = hashedPassword,
-                RoleId = Guid.Parse("22222222-2222-2222-2222-222222222222"), // Role: User
-                CreatedAt = DateTime.UtcNow
-            };
-
-            var created = await _userService.CreateUserAsync(user);
-
-            return Ok(new { message = "User registered successfully.", userId = created.Id });
+                var user = await _userService.RegisterUserAsync(request);
+                return Ok(new { message = "User registered successfully", userId = user.Id });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

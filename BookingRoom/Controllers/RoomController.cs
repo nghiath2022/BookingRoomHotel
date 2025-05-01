@@ -13,9 +13,11 @@ namespace BookingRoom.Controllers
     {
         private readonly IRoomService _roomService;
         private readonly IMapper _mapper;
-        public RoomController(IRoomService roomService, IMapper mapper)
+        private readonly ILogger<RoomController> _logger;
+        public RoomController(ILogger<RoomController> logger,IRoomService roomService, IMapper mapper)
         {
             _roomService = roomService;
+            _logger = logger;
             _mapper = mapper;
         }
 
@@ -23,6 +25,7 @@ namespace BookingRoom.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RoomDto>>> GetAllRooms()
         {
+            _logger.LogInformation("API GET /room called");
             var rooms = await _roomService.GetAllRoomsAsync();
             var roomDtos = _mapper.Map<IEnumerable<RoomDto>>(rooms);
             return Ok(roomDtos);
@@ -32,6 +35,7 @@ namespace BookingRoom.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<RoomDto>> GetRoomById(Guid id)
         {
+            _logger.LogInformation("API GET /room by Id called");
             var room = await _roomService.GetRoomByIdAsync(id);
             if (room == null) return NotFound();
 
@@ -44,6 +48,7 @@ namespace BookingRoom.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<RoomDto>> CreateRoom([FromBody] RoomDto dto)
         {
+            _logger.LogInformation("API POST /create Room called");
             var room = _mapper.Map<Room>(dto);
             var createdRoom = await _roomService.CreateRoomAsync(room);
             var roomDto = _mapper.Map<RoomDto>(createdRoom);
@@ -55,6 +60,7 @@ namespace BookingRoom.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateRoom(Guid id, [FromBody] RoomDto dto)
         {
+            _logger.LogInformation("API POST /update Room called");
             if (id != dto.Id) return BadRequest();
 
             var room = _mapper.Map<Room>(dto);
@@ -67,6 +73,7 @@ namespace BookingRoom.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteRoom(Guid id)
         {
+            _logger.LogInformation("API POST /Delete Room called");
             var result = await _roomService.DeleteRoomAsync(id);
             return result ? Ok() : NotFound();
         }

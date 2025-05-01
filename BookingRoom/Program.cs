@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using BookingRoom.Repositories;
 using BookingRoom.Mappings;
+using BookingRoom.Middleware;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,8 +97,22 @@ builder.Services.AddSwaggerGen(options =>
 
 // ======= 6. Controllers =======
 builder.Services.AddControllers();
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.File("Logs/error-.txt", rollingInterval: RollingInterval.Day,
+        restrictedToMinimumLevel: LogEventLevel.Error) // Write logs with Error level to a separate file
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
+
+app.UseMiddleware<LoggingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -108,6 +125,10 @@ if (app.Environment.IsDevelopment())
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
+
+// Middleware registration (inside app section)
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
 app.UseAuthentication();
 

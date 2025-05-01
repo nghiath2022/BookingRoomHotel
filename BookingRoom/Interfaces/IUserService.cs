@@ -1,4 +1,5 @@
-﻿using BookingRoom.Models;
+﻿using BookingRoom.DTOs;
+using BookingRoom.Models;
 
 namespace BookingRoom.Interfaces
 {
@@ -10,5 +11,6 @@ namespace BookingRoom.Interfaces
         Task<User> UpdateUserAsync(User user);
         Task<bool> DeleteUserAsync(Guid id);
         Task<User> GetUserByEmailAsync(string email);
+        Task<User> RegisterUserAsync(RegisterRequest request);
     }
 }

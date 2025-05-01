@@ -1,4 +1,5 @@
-﻿using BookingRoom.Interfaces;
+﻿using BookingRoom.DTOs;
+using BookingRoom.Interfaces;
 using BookingRoom.Models;
 
 namespace BookingRoom.Services
@@ -40,6 +41,39 @@ namespace BookingRoom.Services
         public async Task<User> GetUserByEmailAsync(string email)
         {
             return await _userRepository.GetUserByEmailAsync(email);
+        }
+
+        public async Task<User> RegisterUserAsync(RegisterRequest request)
+        {
+            var existingUser = await _userRepository.GetUserByEmailAsync(request.Email);
+            if (existingUser != null)
+                throw new InvalidOperationException("Email already registered.");
+
+            if (request.RoleName.ToLower() == "admin")
+            {
+                var anyAdmin = await _userRepository.CheckAdminExistsAsync();
+
+                if (anyAdmin)
+                    throw new UnauthorizedAccessException("Admin already exists.");
+            }
+
+            var role = await _userRepository.GetRoleByNameAsync(request.RoleName);
+            if (role == null)
+                throw new Exception("Role not found.");
+
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                FullName = request.FullName,
+                Email = request.Email,
+                PasswordHash = hashedPassword,
+                RoleId = role.Id,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            return await _userRepository.CreateUserAsync(user);
         }
     }
 }

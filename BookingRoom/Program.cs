@@ -29,17 +29,24 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
+{
+    var secret = builder.Configuration["Jwt:SecretKey"];
+    var issuer = builder.Configuration["Jwt:Issuer"];
+    var audience = builder.Configuration["Jwt:Audience"];
+
+    if (string.IsNullOrEmpty(secret))
+        throw new Exception("Jwt:SecretKey is missing in configuration.");
+
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = issuer,
+        ValidAudience = audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+    };
 });
 
 // ======= 3. Register AutoMapper =======
@@ -47,30 +54,25 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // ===== 3. Dependency Injection (DI) =====
 
-// Auth
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-//JwtService
-builder.Services.AddScoped<IJwtService, JwtService>();
-
-// User
-builder.Services.AddScoped<IUserService, UserService>();
+// === Repository Layer ===
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-// Room
-builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
-
-// Booking
-builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-
-// Payment
-builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
 
 //UnitOfWork
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// === Service Layer ===
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 
 // ===== 4. Add Controllers =====
 builder.Services.AddControllers();
@@ -126,7 +128,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 // Configure the HTTP request pipeline.
 

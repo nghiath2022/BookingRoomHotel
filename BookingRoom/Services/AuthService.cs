@@ -1,11 +1,4 @@
-﻿using BookingRoom.Data;
-using BookingRoom.Interfaces;
-using BookingRoom.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+﻿using BookingRoom.Interfaces;
 namespace BookingRoom.Services
 {
     public class AuthService : IAuthService

@@ -27,16 +27,18 @@ namespace BookingRoom.Services
             };
 
             var secret = _configuration.GetValue<string>("Jwt:SecretKey");
-            if (string.IsNullOrEmpty(secret))
-                throw new Exception("JWT SecretKey is missing in configuration.");
+            var issuer = _configuration["Jwt:Issuer"];
+            var audience = _configuration["Jwt:Audience"];
+
+            if (string.IsNullOrEmpty(secret) || string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience))
+                throw new Exception("JWT configuration is missing.");
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: issuer,
+                audience: audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(2),
                 signingCredentials: creds

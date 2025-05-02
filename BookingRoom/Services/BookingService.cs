@@ -11,7 +11,6 @@ namespace BookingRoom.Services
         {
             _unitOfWork = unitOfWork;
         }
-
         public async Task<IEnumerable<Booking>> GetAllBookingsAsync()
         {
             return await _unitOfWork.Bookings.GetAllBookingsAsync();

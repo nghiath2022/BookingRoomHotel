@@ -36,8 +36,8 @@ namespace BookingRoom.Mappings
             CreateMap<PaymentUpdateDto, Payment>();
 
             //RoomType
-            CreateMap<RoomType, RoomTypeDto>();
-            CreateMap<RoomTypeDto, RoomType>();
+            CreateMap<RoomTypeCreateDto, RoomType>();
+            CreateMap<RoomType, RoomTypeDto>().ReverseMap();
         }
     }
 }

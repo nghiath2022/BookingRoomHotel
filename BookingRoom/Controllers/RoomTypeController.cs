@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
-using BookingRoom.Data;
 using BookingRoom.DTOs;
+using BookingRoom.Interfaces;
 using BookingRoom.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BookingRoom.Controllers
 {
@@ -13,12 +12,12 @@ namespace BookingRoom.Controllers
     [Authorize(Roles = "Admin")]
     public class RoomTypeController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IRoomTypeService _roomTypeService;
         private readonly IMapper _mapper;
 
-        public RoomTypeController(ApplicationDbContext context, IMapper mapper)
+        public RoomTypeController(IRoomTypeService roomTypeService, IMapper mapper)
         {
-            _context = context;
+            _roomTypeService = roomTypeService;
             _mapper = mapper;
         }
 
@@ -26,7 +25,7 @@ namespace BookingRoom.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RoomTypeDto>>> GetAll()
         {
-            var types = await _context.RoomTypes.ToListAsync();
+            var types = await _roomTypeService.GetAllAsync();
             return Ok(_mapper.Map<IEnumerable<RoomTypeDto>>(types));
         }
 
@@ -34,7 +33,7 @@ namespace BookingRoom.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<RoomTypeDto>> GetById(Guid id)
         {
-            var type = await _context.RoomTypes.FindAsync(id);
+            var type = await _roomTypeService.GetByIdAsync(id);
             if (type == null) return NotFound();
 
             return Ok(_mapper.Map<RoomTypeDto>(type));
@@ -42,15 +41,13 @@ namespace BookingRoom.Controllers
 
         // POST: api/roomtype
         [HttpPost]
-        public async Task<ActionResult<RoomTypeDto>> Create(RoomTypeDto dto)
+        public async Task<ActionResult<RoomTypeDto>> Create(RoomTypeCreateDto dto)
         {
-            var type = _mapper.Map<RoomType>(dto);
-            type.Id = Guid.NewGuid();
+            var entity = _mapper.Map<RoomType>(dto);
+            var created = await _roomTypeService.CreateAsync(entity);
+            var resultDto = _mapper.Map<RoomTypeDto>(created);
 
-            _context.RoomTypes.Add(type);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetById), new { id = type.Id }, _mapper.Map<RoomTypeDto>(type));
+            return CreatedAtAction(nameof(GetById), new { id = resultDto.Id }, resultDto);
         }
 
         // PUT: api/roomtype/{id}
@@ -58,25 +55,17 @@ namespace BookingRoom.Controllers
         public async Task<IActionResult> Update(Guid id, RoomTypeDto dto)
         {
             if (id != dto.Id) return BadRequest();
-
-            var type = _mapper.Map<RoomType>(dto);
-            _context.RoomTypes.Update(type);
-            await _context.SaveChangesAsync();
-
-            return Ok(_mapper.Map<RoomTypeDto>(type));
+            var entity = _mapper.Map<RoomType>(dto);
+            var updated = await _roomTypeService.UpdateAsync(entity);
+            return Ok(_mapper.Map<RoomTypeDto>(updated));
         }
 
         // DELETE: api/roomtype/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var type = await _context.RoomTypes.FindAsync(id);
-            if (type == null) return NotFound();
-
-            _context.RoomTypes.Remove(type);
-            await _context.SaveChangesAsync();
-
-            return Ok();
+            var deleted = await _roomTypeService.DeleteAsync(id);
+            return deleted ? NoContent() : NotFound();
         }
     }
 }

@@ -29,7 +29,7 @@ namespace BookingRoom.Controllers
 
             if (token == null)
                 return Unauthorized(new { message = "Invalid credentials." });
-
+            
             return Ok(new { token });
         }
 

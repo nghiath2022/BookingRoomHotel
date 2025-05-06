@@ -14,6 +14,7 @@ namespace BookingRoom.Data
         public DbSet<RoomType> RoomTypes { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -71,6 +72,13 @@ namespace BookingRoom.Data
                 .WithMany(rt => rt.Rooms)
                 .HasForeignKey(r => r.RoomTypeId);
 
+            // Customer - Booking (One to Many)
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Customer)
+                .WithMany(c => c.Bookings)
+                .HasForeignKey(b => b.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             // Precision for decimal fields
             modelBuilder.Entity<Booking>()
                 .Property(b => b.TotalPrice)
@@ -83,6 +91,7 @@ namespace BookingRoom.Data
             modelBuilder.Entity<Room>()
                 .Property(r => r.Price)
                 .HasPrecision(18, 2);
+
         }
     }
 }

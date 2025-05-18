@@ -7,6 +7,7 @@
         IRoomTypeRepository RoomTypes { get; }
         IBookingRepository Bookings { get; }
         IPaymentRepository Payments { get; }
+        ICustomerRepository Customers { get; }
 
         Task<int> CompleteAsync(); // = SaveChangesAsync()
     }

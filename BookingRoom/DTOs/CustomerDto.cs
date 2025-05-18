@@ -6,22 +6,22 @@ namespace BookingRoom.DTOs
     {
         public Guid Id { get; set; }
 
-        [Required]
-        [StringLength(100)]
+        //[Required]
+        //[StringLength(100)]
         public string FullName { get; set; }
 
-        [Required]
-        [EmailAddress]
+        //[Required]
+        //[EmailAddress]
         public string Email { get; set; }
 
-        [Required]
-        [Phone]
+        //[Required]
+        //[Phone]
         public string Phone { get; set; }
 
-        [StringLength(200)]
+        //[StringLength(200)]
         public string Address { get; set; }
 
-        [StringLength(50)]
+        //[StringLength(50)]
         public string IdentityNumber { get; set; }
     }
 }

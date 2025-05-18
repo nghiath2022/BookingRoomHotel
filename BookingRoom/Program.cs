@@ -11,18 +11,35 @@ using BookingRoom.Mappings;
 using BookingRoom.Middleware;
 using Serilog;
 using Serilog.Events;
+using FluentValidation.AspNetCore;
+using BookingRoom.Validators;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
 
 // ===== 1.Add DbContext and using SQL Server , use config from appsettings.json
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ===== 2. Add Authentication (JWT) =====
+// =======================
+// 2. Add FluentValidation (v11+)
+// =======================
+builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<CustomerDtoValidator>(); // Register Customer validators
+builder.Services.AddValidatorsFromAssemblyContaining<RoomDtoValidator>(); // Register Customer validators
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RoomTypeDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<PaymentDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<BookingDtoValidator>();
+
+// =======================
+// 3. Add AutoMapper
+// =======================
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// ===== 4. Add Authentication (JWT) =====
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -49,17 +66,14 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ======= 3. Register AutoMapper =======
-builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-// ===== 3. Dependency Injection (DI) =====
-
+// ===== 5. Dependency Injection (DI) =====
 // === Repository Layer ===
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 //UnitOfWork
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -72,12 +86,9 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
-
-// ===== 4. Add Controllers =====
-builder.Services.AddControllers();
-
-// ===== 5. Add Swagger (OpenAPI) =====
+// ===== 6. Add Swagger (OpenAPI) =====
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -103,8 +114,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// ======= 6. Controllers =======
-builder.Services.AddControllers();
+
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -134,8 +144,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Middleware registration (inside app section)
-app.UseMiddleware<ExceptionMiddleware>();
 app.UseMiddleware<RequestResponseLoggingMiddleware>();
+app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 
 app.UseAuthentication();
 

@@ -41,7 +41,7 @@ namespace BookingRoom.Controllers
 
         // POST: api/roomtype
         [HttpPost]
-        public async Task<ActionResult<RoomTypeDto>> Create(RoomTypeCreateDto dto)
+        public async Task<ActionResult<RoomTypeDto>> Create(RoomTypeDto dto)
         {
             var entity = _mapper.Map<RoomType>(dto);
             var created = await _roomTypeService.CreateAsync(entity);

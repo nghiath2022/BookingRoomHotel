@@ -15,9 +15,7 @@ namespace BookingRoom.Mappings
             CreateMap<UserDto, User>();
 
             // Room
-            CreateMap<Room, RoomDto>()
-                .ForMember(dest => dest.RoomTypeName, opt => opt.MapFrom(src => src.RoomType.TypeName));
-
+            CreateMap<Room, RoomDto>();
             CreateMap<RoomDto, Room>();
 
             // Booking, Payment: bạn có thể thêm tiếp ở đây

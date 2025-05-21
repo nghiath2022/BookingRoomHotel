@@ -5,17 +5,45 @@ namespace BookingRoom.Services
 {
     public class CustomerService : ICustomerService
     {
-        private readonly ICustomerRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CustomerService(ICustomerRepository repository)
+        public CustomerService(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
-        public Task<IEnumerable<Customer>> GetAllAsync() => _repository.GetAllAsync();
-        public Task<Customer?> GetByIdAsync(Guid id) => _repository.GetByIdAsync(id);
-        public Task<Customer> CreateAsync(Customer customer) => _repository.CreateAsync(customer);
-        public Task<Customer> UpdateAsync(Customer customer) => _repository.UpdateAsync(customer);
-        public Task<bool> DeleteAsync(Guid id) => _repository.DeleteAsync(id);
+        public async Task<IEnumerable<Customer>> GetAllAsync()
+        {
+            return await _unitOfWork.Customers.GetAllAsync();
+        }
+
+        public async Task<Customer?> GetByIdAsync(Guid id)
+        {
+            return await _unitOfWork.Customers.GetByIdAsync(id);
+        }
+
+        public async Task<Customer> CreateAsync(Customer customer)
+        {
+            var createdCustomer = await _unitOfWork.Customers.CreateAsync(customer);
+            await _unitOfWork.CompleteAsync(); // Save changes
+            return createdCustomer;
+        }
+
+        public async Task<Customer> UpdateAsync(Customer customer)
+        {
+            var updatedCustomer = await _unitOfWork.Customers.UpdateAsync(customer);
+            await _unitOfWork.CompleteAsync(); // Save changes
+            return updatedCustomer;
+        }
+
+        public async Task<bool> DeleteAsync(Guid id)
+        {
+            var deleted = await _unitOfWork.Customers.DeleteAsync(id);
+            if (deleted)
+            {
+                await _unitOfWork.CompleteAsync(); // Save changes
+            }
+            return deleted;
+        }
     }
 }

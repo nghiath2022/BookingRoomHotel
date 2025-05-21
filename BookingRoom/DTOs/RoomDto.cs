@@ -7,8 +7,6 @@
         public decimal Price { get; set; }
         public string Description { get; set; }
         public string Status { get; set; }
-
-        // Lấy thông tin tên loại phòng thay vì object RoomType
-        public string RoomTypeName { get; set; }
+        public Guid RoomTypeId { get; set; }
     }
 }

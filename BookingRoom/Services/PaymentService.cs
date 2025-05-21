@@ -5,36 +5,45 @@ namespace BookingRoom.Services
 {
     public class PaymentService : IPaymentService
     {
-        private readonly IPaymentRepository _paymentRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public PaymentService(IPaymentRepository paymentRepository)
+        public PaymentService(IUnitOfWork unitOfWork)
         {
-            _paymentRepository = paymentRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<Payment>> GetAllPaymentsAsync()
         {
-            return await _paymentRepository.GetAllPaymentsAsync();
+            return await _unitOfWork.Payments.GetAllPaymentsAsync();
         }
 
         public async Task<Payment?> GetPaymentByIdAsync(Guid id)
         {
-            return await _paymentRepository.GetPaymentByIdAsync(id);
+            return await _unitOfWork.Payments.GetPaymentByIdAsync(id);
         }
 
         public async Task<Payment> CreatePaymentAsync(Payment payment)
         {
-            return await _paymentRepository.CreatePaymentAsync(payment);
+            var createdPayment = await _unitOfWork.Payments.CreatePaymentAsync(payment);
+            await _unitOfWork.CompleteAsync(); // Save changes
+            return createdPayment;
         }
 
         public async Task<Payment> UpdatePaymentAsync(Payment payment)
         {
-            return await _paymentRepository.UpdatePaymentAsync(payment);
+            var updatedPayment = await _unitOfWork.Payments.UpdatePaymentAsync(payment);
+            await _unitOfWork.CompleteAsync(); // Save changes
+            return updatedPayment;
         }
 
         public async Task<bool> DeletePaymentAsync(Guid id)
         {
-            return await _paymentRepository.DeletePaymentAsync(id);
+            var deleted = await _unitOfWork.Payments.DeletePaymentAsync(id);
+            if (deleted)
+            {
+                await _unitOfWork.CompleteAsync(); // Save changes
+            }
+            return deleted;
         }
     }
 }

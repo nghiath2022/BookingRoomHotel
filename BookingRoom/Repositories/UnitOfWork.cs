@@ -12,6 +12,7 @@ namespace BookingRoom.Repositories
         public IRoomTypeRepository RoomTypes { get; }
         public IBookingRepository Bookings { get; }
         public IPaymentRepository Payments { get; }
+        public ICustomerRepository Customers { get; }
 
         public UnitOfWork(
             ApplicationDbContext context,
@@ -19,7 +20,8 @@ namespace BookingRoom.Repositories
             IRoomRepository rooms,
             IRoomTypeRepository roomTypes,
             IBookingRepository bookings,
-            IPaymentRepository payments)
+            IPaymentRepository payments,
+            ICustomerRepository customers)
         {
             _context = context;
             Users = users;
@@ -27,6 +29,7 @@ namespace BookingRoom.Repositories
             RoomTypes = roomTypes;
             Bookings = bookings;
             Payments = payments;
+            Customers = customers;
         }
 
         public async Task<int> CompleteAsync()

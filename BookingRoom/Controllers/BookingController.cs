@@ -77,5 +77,6 @@ namespace BookingRoom.Controllers
             var result = await _bookingService.CancelBookingAsync(id);
             return result ? Ok() : NotFound();
         }
+
     }
 }

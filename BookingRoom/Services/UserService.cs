@@ -6,58 +6,61 @@ namespace BookingRoom.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUnitOfWork unitOfWork)
         {
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
         }
-
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            return await _userRepository.GetAllUsersAsync();
+            return await _unitOfWork.Users.GetAllUsersAsync();
         }
-
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            return await _userRepository.GetUserByIdAsync(id);
+            return await _unitOfWork.Users.GetUserByIdAsync(id);
         }
-
         public async Task<User> CreateUserAsync(User user)
         {
-            return await _userRepository.CreateUserAsync(user);
+            var created = await _unitOfWork.Users.CreateUserAsync(user);
+            await _unitOfWork.CompleteAsync();
+            return created;
         }
 
         public async Task<User> UpdateUserAsync(User user)
         {
-            return await _userRepository.UpdateUserAsync(user);
+            var updated = await _unitOfWork.Users.UpdateUserAsync(user);
+            await _unitOfWork.CompleteAsync();
+            return updated;
         }
 
         public async Task<bool> DeleteUserAsync(Guid id)
         {
-            return await _userRepository.DeleteUserAsync(id);
+            var deleted = await _unitOfWork.Users.DeleteUserAsync(id);
+            if (deleted)
+                await _unitOfWork.CompleteAsync();
+            return deleted;
         }
 
         public async Task<User?> GetUserByEmailAsync(string email)
         {
-            return await _userRepository.GetUserByEmailAsync(email);
+            return await _unitOfWork.Users.GetUserByEmailAsync(email);
         }
 
         public async Task<User> RegisterUserAsync(RegisterRequest request)
         {
-            var existingUser = await _userRepository.GetUserByEmailAsync(request.Email);
+            var existingUser = await _unitOfWork.Users.GetUserByEmailAsync(request.Email);
             if (existingUser != null)
                 throw new InvalidOperationException("Email already registered.");
 
             if (request.RoleName.ToLower() == "admin")
             {
-                var anyAdmin = await _userRepository.CheckAdminExistsAsync();
-
+                var anyAdmin = await _unitOfWork.Users.CheckAdminExistsAsync();
                 if (anyAdmin)
                     throw new UnauthorizedAccessException("Admin already exists.");
             }
 
-            var role = await _userRepository.GetRoleByNameAsync(request.RoleName);
+            var role = await _unitOfWork.Users.GetRoleByNameAsync(request.RoleName);
             if (role == null)
                 throw new Exception("Role not found.");
 
@@ -73,7 +76,10 @@ namespace BookingRoom.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            return await _userRepository.CreateUserAsync(user);
+            var createdUser = await _unitOfWork.Users.CreateUserAsync(user);
+            await _unitOfWork.CompleteAsync();
+
+            return createdUser;
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35919.96 d17.13
+VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingRoom", "BookingRoom\BookingRoom.csproj", "{FD84B70F-B0D5-4475-A316-4E68E77CAF9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingRoom.UnitTest", "BookingRoom.UnitTest\BookingRoom.UnitTest.csproj", "{16DF43EA-FDC0-42CC-B5BF-F6D5A8F22719}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{FD84B70F-B0D5-4475-A316-4E68E77CAF9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD84B70F-B0D5-4475-A316-4E68E77CAF9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD84B70F-B0D5-4475-A316-4E68E77CAF9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16DF43EA-FDC0-42CC-B5BF-F6D5A8F22719}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16DF43EA-FDC0-42CC-B5BF-F6D5A8F22719}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16DF43EA-FDC0-42CC-B5BF-F6D5A8F22719}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16DF43EA-FDC0-42CC-B5BF-F6D5A8F22719}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
